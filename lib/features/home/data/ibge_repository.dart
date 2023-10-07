@@ -1,14 +1,9 @@
 import 'dart:io';
-
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-import '../model/notice_model.dart';
+import 'package:result_dart/result_dart.dart';
 
 class IbgeRepository {
-  Future<NewsIbgeModel> getNoticeEmphasis() async {
-    NewsIbgeModel result = NoticeIBGEModel();
-
+  Future<Result<http.Response, String>> getNoticeEmphasis() async {
     try {
       final uri = Uri.http(
         'servicodados.ibge.gov.br',
@@ -17,16 +12,14 @@ class IbgeRepository {
       );
 
       final http.Response response = await http.get(uri);
-      print(response.body);
-
       if (response.statusCode == HttpStatus.ok) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        result = NewsIbgeModel.fromJson(data);
-        print(response.body);
+        return Result.success(response);
+      } else {
+        return Result.failure('Erro de HTTP: ${response.statusCode}');
       }
     } catch (e) {
       print(e);
+      return Result.failure('Erro REPOSITORY ao buscar notícias: $e');
     }
-    return result;
   }
 }

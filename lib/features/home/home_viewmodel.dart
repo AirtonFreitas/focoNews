@@ -1,25 +1,34 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'data/ibge_repository.dart';
-import 'model/notice_model.dart';
+import 'package:result_dart/result_dart.dart';
+import 'data/get_news_ibge_usecase.dart';
+import 'model/item_notice_model.dart';
+import 'model/news_model.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  final IbgeRepository _ibgerepository = IbgeRepository();
+  final GetNewsIbgeUsecase _getNewsIbgeUsecase = GetNewsIbgeUsecase();
 
   bool isLoading = true;
-  late NewsIbgeModel news;
-  List<NoticeIBGEModel> itemsNews = [];
+  Result<NewsIbgeModel, String>? newsIbgeResult;
+  List<ItemNoticeIBGEModel> itemsNewsIbge = [];
 
   Future<void> getNewsEmphasis() async {
     isLoading = true;
+    notifyListeners();
 
-    news = await _ibgerepository.getNoticeEmphasis();
+    newsIbgeResult = await _getNewsIbgeUsecase.getNewsIbge();
 
-    if (news.items != null && news.items!.isNotEmpty) {
-      itemsNews = news.items!;
-    }
-
+    newsIbgeResult!.fold(
+      (newsIbge) {
+        if (newsIbge.items != null && newsIbge.items!.isNotEmpty) {
+          itemsNewsIbge = newsIbge.items!;
+        }
+      },
+      (error) {
+        print(error);
+      },
+    );
     isLoading = false;
     notifyListeners();
   }
