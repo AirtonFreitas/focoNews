@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'data/ibge_repository.dart';
 import 'model/notice_model.dart';
@@ -13,9 +15,9 @@ class HomeViewModel extends ChangeNotifier {
     isLoading = true;
 
     news = await _ibgerepository.getNoticeEmphasis();
-    if(news.items != null){
-      itemsNews = news.items!;
 
+    if (news.items != null && news.items!.isNotEmpty) {
+      itemsNews = news.items!;
     }
 
     isLoading = false;

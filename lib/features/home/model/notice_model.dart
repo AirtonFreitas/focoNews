@@ -1,3 +1,5 @@
+import 'package:foco_news/features/home/model/images_notice_model.dart';
+
 class NewsIbgeModel {
   int? count;
   int? page;
@@ -45,24 +47,25 @@ class NoticeIBGEModel {
   int? produtoId;
   String? produtos;
   String? editorias;
-  String? imagens;
+  ImagesIBGEModel? imagens; // Agora é uma instância da classe ImagensIBGEModel
   String? produtosRelacionados;
   bool? destaque;
   String? link;
 
-  NoticeIBGEModel(
-      {this.id,
-        this.tipo,
-        this.titulo,
-        this.introducao,
-        this.dataPublicacao,
-        this.produtoId,
-        this.produtos,
-        this.editorias,
-        this.imagens,
-        this.produtosRelacionados,
-        this.destaque,
-        this.link});
+  NoticeIBGEModel({
+    this.id,
+    this.tipo,
+    this.titulo,
+    this.introducao,
+    this.dataPublicacao,
+    this.produtoId,
+    this.produtos,
+    this.editorias,
+    this.imagens, // Agora é do tipo ImagensIBGEModel
+    this.produtosRelacionados,
+    this.destaque,
+    this.link,
+  });
 
   NoticeIBGEModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -73,9 +76,10 @@ class NoticeIBGEModel {
     produtoId = json['produto_id'];
     produtos = json['produtos'];
     editorias = json['editorias'];
-    imagens = json['imagens'];
+    imagens = ImagesIBGEModel.fromJson(json); // Agora está criando uma instância de ImagensIBGEModel
     produtosRelacionados = json['produtos_relacionados'];
     destaque = json['destaque'];
     link = json['link'];
   }
 }
+

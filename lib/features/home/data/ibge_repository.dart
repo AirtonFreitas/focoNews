@@ -7,7 +7,7 @@ import '../model/notice_model.dart';
 
 class IbgeRepository {
   Future<NewsIbgeModel> getNoticeEmphasis() async {
-    NewsIbgeModel result = NewsIbgeModel();
+    NewsIbgeModel result = NoticeIBGEModel();
 
     try {
       final uri = Uri.http(

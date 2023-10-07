@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foco_news/features/home/home_viewmodel.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -9,11 +10,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  final HomeViewModel homeViewModel = HomeViewModel();
+  final HomeViewModel viewmodel = HomeViewModel();
 
   @override
   void initState() {
-    homeViewModel.getNewsEmphasis();
+    viewmodel.getNewsEmphasis();
     super.initState();
   }
 
@@ -22,11 +23,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Scaffold(
       body: AnimatedBuilder(
         builder: (context, child) {
-          return homeViewModel.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _bodyPage();
+          return _bodyPage();
         },
-        animation: homeViewModel,
+        animation: viewmodel,
       ),
     );
   }
@@ -38,25 +37,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _noticeCard() {
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height,
-      child: Column(
-        children: [
-          Text(homeViewModel.itemsNews.first.titulo!),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: homeViewModel.itemsNews.length,
-              itemBuilder: (BuildContext context, int index) {
-                return SizedBox(
-                  height: 50,
-                  child: Center(child: Text('${homeViewModel.itemsNews[index].titulo}')),
-                );
-              },
-            ),
-          ),
-        ],
+      child: Skeletonizer(
+        enabled: viewmodel.isLoading,
+        child: Column(mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(viewmodel.itemsNews.isNotEmpty ? viewmodel.itemsNews.first.titulo! : _exampleTitle()),
+            Text(viewmodel.itemsNews.isNotEmpty ? viewmodel.itemsNews.first.introducao! : _exampleIntroduction()),
+            // Image.network(viewmodel.itemsNews.isNotEmpty ? '${viewmodel.itemsNews.first.imagens!}' : ''),
+          ],
+        ),
       ),
     );
   }
+
+  String _exampleTitle(){
+    return '____________________________________';
+  }
+  String _exampleIntroduction(){
+    return '_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________';
+  }
+
 }
