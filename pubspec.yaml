@@ -36,6 +36,7 @@ dependencies:
   result_dart: ^1.1.0
   carousel_slider: ^4.2.1
   dots_indicator: ^3.0.0
+  get_it: ^7.6.4
 
 dev_dependencies:
   flutter_test:
