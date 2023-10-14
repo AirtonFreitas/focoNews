@@ -1,5 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:foco_news/features/home/home_viewmodel.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -13,7 +15,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
-    viewmodel.getNewsEmphasis();
+    loadNews();
     super.initState();
   }
 
@@ -23,124 +25,110 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final CarouselController _carouselController = CarouselController();
   final List<Widget> _widgetsCarousel = [];
 
-  //
-  // void addToCarousel() {
-  //   for (int i = 0; i < _widgetsCarousel.length; i++) {
-  //     if (_widgetsCarousel[i] is Text) {
-  //       Text textWidget = _widgetsCarousel[i] as Text;
-  //       String noticia = textWidget.data ?? '';
-  //       // Faça o que precisar com a variável "noticia"
-  //     }
-  //   }  }
-
   @override
   Widget build(BuildContext context) {
+    // SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    //   statusBarColor: Colors.yellow,
+    // ));
+
     return Scaffold(
-      body: AnimatedBuilder(
-        builder: (context, child) {
-          return _bodyPage();
-        },
-        animation: viewmodel,
+      body: SafeArea(
+        child: AnimatedBuilder(
+          builder: (context, child) {
+            return _bodyPage();
+          },
+          animation: viewmodel,
+        ),
       ),
     );
   }
 
   Widget _bodyPage() {
     return Column(
-      children: [carousel()],
+      children: [carousel(), dotIndicator()],
     );
   }
 
   Widget carousel() {
-    // _widgetsCarousel.addAll(viewmodel.itemsNewsIbge.map((item) {
-    //   return Skeletonizer(
-    //     enabled: viewmodel.isLoading || viewmodel.itemsNewsIbge.isEmpty,
-    //     child: Column(
-    //       children: [
-    //         Text(viewmodel.itemsNewsIbge.isNotEmpty
-    //             ? item.titulo!
-    //             : _exampleTitle()),
-    //         Text(viewmodel.itemsNewsIbge.isNotEmpty
-    //             ? item.introducao!
-    //             : _exampleIntroduction()),
-    //         viewmodel.itemsNewsIbge.isNotEmpty
-    //             ? Image.network(
-    //           'https://agenciadenoticias.ibge.gov.br/${item.imagens!.imageIntro}',
-    //           width: 200,
-    //         )
-    //             : const Skeleton.replace(
-    //             width: 200,height: 100,
-    //             child: SizedBox.shrink()),
-    //       ],
-    //     ),
-    //   );
-    // }));
-    //
-    //
-    // return   CarouselSlider(
-    //   carouselController: _carouselController,
-    //   items: _widgetsCarousel,
-    //   options: CarouselOptions(
-    //     onPageChanged: (index, reason) {
-    //       setState(() {
-    //         _currentIndex = index;
-    //       });
-    //     },
-    //   ),
-    // );
-
-    return SizedBox(
-      height: MediaQuery.of(context).size.height,
-      child: Skeletonizer(
-        enabled: viewmodel.isLoading || viewmodel.itemsNewsIbge.isEmpty,
-        child: Column(
-          children: [
-            Text(viewmodel.itemsNewsIbge.isNotEmpty
-                ? viewmodel.itemsNewsIbge.first.titulo!
-                : _exampleTitle()),
-            Text(viewmodel.itemsNewsIbge.isNotEmpty
-                ? viewmodel.itemsNewsIbge.first.introducao!
-                : _exampleIntroduction()),
-            viewmodel.itemsNewsIbge.isNotEmpty
-                ? Image.network(
-                    'https://agenciadenoticias.ibge.gov.br/${viewmodel.itemsNewsIbge.first.imagens!.imageIntro}',
-                    width: 200,
-                  )
-                : const Skeleton.replace(
-                    width: 200, height: 100, child: SizedBox.shrink()),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _carousel() {
     return CarouselSlider(
       carouselController: _carouselController,
       items: _widgetsCarousel,
       options: CarouselOptions(
-        onPageChanged: (index, reason) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
+          height: 260,
+          viewportFraction: 1,
+          onPageChanged: (index, reason) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          autoPlay: true),
     );
-    // DotsIndicator(
-    // dotsCount: _widgetsCarousel.length,
-    // position: _currentIndex,
-    // decorator: const DotsDecorator(
-    // color: Colors.grey,
-    // activeColor: ColorsUtil.bluetwo,
-    // ),
-    // ),
   }
 
-  String _exampleTitle() {
-    return '____________________________________';
+  Widget dotIndicator() {
+    return _widgetsCarousel.isNotEmpty ? DotsIndicator(
+      dotsCount: _widgetsCarousel.length,
+      position: _currentIndex,
+      decorator: const DotsDecorator(
+        color: Colors.grey,
+        activeColor: Colors.red,
+      ),
+    ) : const SizedBox.shrink();
   }
 
-  String _exampleIntroduction() {
-    return '_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________';
+  void loadNews() async {
+    await viewmodel.getNewsEmphasis();
+    addCarousel();
+  }
+
+  void addCarousel() {
+    _widgetsCarousel.addAll(viewmodel.itemsNewsIbge.map((item) {
+      return SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: Skeletonizer(
+          enabled: viewmodel.isLoading || viewmodel.itemsNewsIbge.isEmpty,
+          child: Column(
+            children: [
+              SizedBox(
+                width: MediaQuery.sizeOf(context).width,
+                child: Stack(
+                  children: [
+                    SizedBox(
+                      width: MediaQuery.sizeOf(context).width,
+                      height: 260,
+                    ),
+                    ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(36),
+                          bottomLeft: Radius.circular(36)),
+                      child: Image.network(
+                        'https://agenciadenoticias.ibge.gov.br/${item.imagens!.imageIntro}',
+                        width: MediaQuery.sizeOf(context).width,
+                        height: 250,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      bottom: -0,
+                      right: 0,
+                      child: Container(
+                        padding: EdgeInsets.all(6),
+                        width: MediaQuery.sizeOf(context).width * 0.7,
+                        color: Colors.red,
+                        child: Text(
+                          item.titulo!,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }));
   }
 }

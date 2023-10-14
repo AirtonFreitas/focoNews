@@ -8,7 +8,7 @@ class IbgeRepository {
       final uri = Uri.http(
         'servicodados.ibge.gov.br',
         '/api/v3/noticias/',
-        {'qtd': '5'},
+        {'qtd': '10'},
       );
 
       final http.Response response = await http.get(uri);

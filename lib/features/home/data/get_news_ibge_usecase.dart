@@ -11,10 +11,11 @@ class GetNewsIbgeUsecase {
 
   Future<Result<NewsIbgeModel, String>> getNewsIbge() async {
     try {
-      final Result<http.Response, String> result = await ibgeRepository.getNoticeEmphasis();
+      final Result<http.Response, String> result =
+          await ibgeRepository.getNoticeEmphasis();
 
       return result.fold(
-            (response) {
+        (response) {
           try {
             final Map<String, dynamic> data = json.decode(response.body);
             final NewsIbgeModel newsIbgeModel = NewsIbgeModel.fromJson(data);
@@ -23,7 +24,7 @@ class GetNewsIbgeUsecase {
             return Result.failure('Erro ao decodificar JSON: $e');
           }
         },
-            (error) {
+        (error) {
           return Result.failure('Erro de HTTP: $error');
         },
       );
@@ -32,5 +33,4 @@ class GetNewsIbgeUsecase {
       return Result.failure('Erro USECASE ao buscar notícias: $e');
     }
   }
-
 }
