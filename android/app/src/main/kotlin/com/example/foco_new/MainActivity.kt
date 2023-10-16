@@ -1,4 +1,4 @@
-package com.foconews.foco_news
+package com.example.foco_new
 
 import io.flutter.embedding.android.FlutterActivity
 
